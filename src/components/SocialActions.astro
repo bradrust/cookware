@@ -1,0 +1,76 @@
+---
+type Props = {
+  title: string;
+  description: string;
+  url: string;         // absolute URL to this recipe
+  image?: string;      // absolute or root-relative hero image URL
+};
+
+const { title, description, url, image } = Astro.props;
+
+// Pinterest expects an absolute image URL. If we were given a relative path,
+// resolve against Astro.site so the Pin previews correctly.
+const absoluteImage = (() => {
+  if (!image) return undefined;
+  try {
+    return new URL(image, Astro.site).toString();
+  } catch {
+    return image;
+  }
+})();
+
+const pinterestUrl = (() => {
+  const params = new URLSearchParams({
+    url,
+    description: `${title} — ${description}`,
+  });
+  if (absoluteImage) params.set("media", absoluteImage);
+  return `https://www.pinterest.com/pin/create/button/?${params.toString()}`;
+})();
+
+// mailto: — opens the viewer's mail client with a pre-filled recipe email.
+// %0A is a URL-encoded newline. Subject + body must be encoded.
+const mailtoUrl = (() => {
+  const subject = `Recipe: ${title}`;
+  const body = `${description}\n\nSee the full recipe here:\n${url}`;
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+})();
+---
+
+<div class="not-print flex flex-wrap gap-2 my-6">
+  <a
+    href={pinterestUrl}
+    target="_blank"
+    rel="noopener"
+    class="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm no-underline hover:border-red-500 hover:bg-red-50 transition"
+    aria-label="Save this recipe to Pinterest"
+  >
+    <span aria-hidden="true">📌</span>
+    <span>Save to Pinterest</span>
+  </a>
+
+  <button
+    type="button"
+    data-action="print"
+    class="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm hover:border-neutral-500 hover:bg-neutral-50 transition"
+    aria-label="Print this recipe"
+  >
+    <span aria-hidden="true">🖨</span>
+    <span>Print</span>
+  </button>
+
+  <a
+    href={mailtoUrl}
+    class="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm no-underline hover:border-blue-500 hover:bg-blue-50 transition"
+    aria-label="Email this recipe to yourself"
+  >
+    <span aria-hidden="true">✉️</span>
+    <span>Email to myself</span>
+  </a>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('button[data-action="print"]').forEach((btn) => {
+    btn.addEventListener("click", () => window.print());
+  });
+</script>

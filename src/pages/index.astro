@@ -1,0 +1,81 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import RecipeCard from "../components/RecipeCard.astro";
+import EmailSignup from "../components/EmailSignup.astro";
+import { SITE } from "../lib/config";
+
+const recipes = (await getCollection("recipes"))
+  .filter((r) => !r.data.draft)
+  .sort(
+    (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+  );
+
+// Handful of high-traffic category shortcuts on the homepage.
+const FEATURED_CATEGORIES: Array<{ href: string; label: string; icon: string }> = [
+  { href: "/browse/occasion/weeknight", label: "Weeknight", icon: "🕕" },
+  { href: "/browse/occasion/meal-prep", label: "Meal prep", icon: "📦" },
+  { href: "/browse/occasion/kid-friendly", label: "Kid-friendly", icon: "🧒" },
+  { href: "/browse/occasion/date-night", label: "Date night", icon: "🕯" },
+  { href: "/browse/occasion/cheap-eats", label: "Cheap eats", icon: "💸" },
+  { href: "/browse/dietary/vegetarian", label: "Vegetarian", icon: "🥗" },
+  { href: "/browse/dietary/vegan", label: "Vegan", icon: "🌱" },
+  { href: "/browse/dietary/keto", label: "Keto", icon: "🥑" },
+  { href: "/browse/cuisine/mexican", label: "Mexican", icon: "🌮" },
+  { href: "/browse/cuisine/italian", label: "Italian", icon: "🍝" },
+  { href: "/browse/method/sheet-pan", label: "Sheet pan", icon: "🍳" },
+  { href: "/browse/method/one-pot", label: "One-pot", icon: "🍲" },
+];
+---
+
+<Layout title={SITE.name} description={SITE.tagline}>
+  <section class="mx-auto max-w-5xl px-4 pt-16 pb-8 text-center">
+    <h1 class="font-display text-4xl sm:text-6xl font-bold tracking-tight text-neutral-900">
+      Dinner. Faster than takeout.
+    </h1>
+    <p class="mt-4 text-lg text-neutral-600 max-w-prose mx-auto">
+      Every recipe is 15 minutes or less. Every ingredient is one click from
+      your door. Cook it tonight.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 pb-10">
+    <div class="flex flex-wrap justify-center gap-2">
+      {
+        FEATURED_CATEGORIES.map((c) => (
+          <a
+            href={c.href}
+            class="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-3 py-1.5 text-sm no-underline hover:border-brand-500 hover:bg-brand-50 transition"
+          >
+            <span>{c.icon}</span>
+            <span>{c.label}</span>
+          </a>
+        ))
+      }
+      <a
+        href="/browse"
+        class="inline-flex items-center gap-1.5 rounded-full border border-brand-500 bg-brand-50 text-brand-800 px-3 py-1.5 text-sm no-underline hover:bg-brand-100 transition"
+      >
+        Browse all →
+      </a>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 pb-16">
+    {
+      recipes.length === 0 ? (
+        <p class="text-center text-neutral-500 py-20">
+          No recipes yet. Add one to <code>src/content/recipes/</code> to get started.
+        </p>
+      ) : (
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {recipes.map((recipe) => <RecipeCard recipe={recipe} />)}
+        </div>
+      )
+    }
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4">
+    <EmailSignup />
+  </section>
+</Layout>

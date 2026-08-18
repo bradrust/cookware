@@ -1,0 +1,39 @@
+---
+import { amazonUrlFor, type Ingredient } from "../lib/retailers";
+
+type Props = {
+  ingredients: Ingredient[];
+};
+
+const { ingredients } = Astro.props;
+---
+
+<div>
+  <h2 class="text-2xl font-display font-bold mb-4">Ingredients</h2>
+  <ul class="divide-y divide-neutral-200 border-y border-neutral-200">
+    {
+      ingredients.map((ing) => (
+        <li class="flex items-center justify-between gap-4 py-3">
+          <div class="flex-1">
+            <div class="font-medium text-neutral-900">{ing.name}</div>
+            {ing.quantity && (
+              <div class="text-sm text-neutral-500">{ing.quantity}</div>
+            )}
+          </div>
+          <a
+            href={amazonUrlFor(ing)}
+            target="_blank"
+            rel="noopener sponsored"
+            class="text-sm no-underline rounded-md border border-neutral-300 px-3 py-1.5 hover:bg-neutral-50 whitespace-nowrap"
+            aria-label={`Buy ${ing.name} on Amazon`}
+          >
+            Buy →
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-3 text-xs text-neutral-500">
+    Individual links go to Amazon. For a full cart, use the shop buttons above.
+  </p>
+</div>

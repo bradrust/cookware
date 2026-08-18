@@ -1,0 +1,70 @@
+---
+type Props = {
+  slug: string;
+  /** Larger button for the recipe detail page; small chip for cards. */
+  size?: "sm" | "md";
+};
+
+const { slug, size = "md" } = Astro.props;
+const sizeCls = size === "sm" ? "h-8 w-8 text-base" : "h-10 w-10 text-xl";
+---
+
+<button
+  type="button"
+  class:list={[
+    "favorite-button inline-flex items-center justify-center rounded-full bg-white/90 backdrop-blur border border-neutral-300 shadow-sm hover:scale-105 transition",
+    sizeCls,
+  ]}
+  data-slug={slug}
+  data-active="false"
+  aria-label="Save recipe"
+  aria-pressed="false"
+>
+  <span class="favorite-icon" aria-hidden="true">♡</span>
+</button>
+
+<script>
+  import {
+    isFavorite,
+    toggleFavorite,
+    onFavoritesChanged,
+  } from "../lib/favorites-client";
+
+  function paint(btn: HTMLButtonElement, active: boolean) {
+    btn.dataset.active = String(active);
+    btn.setAttribute("aria-pressed", String(active));
+    btn.setAttribute("aria-label", active ? "Remove from saved" : "Save recipe");
+    const icon = btn.querySelector<HTMLSpanElement>(".favorite-icon");
+    if (icon) icon.textContent = active ? "♥" : "♡";
+    btn.classList.toggle("text-red-600", active);
+    btn.classList.toggle("border-red-300", active);
+  }
+
+  function wire(btn: HTMLButtonElement) {
+    const slug = btn.dataset.slug;
+    if (!slug) return;
+    paint(btn, isFavorite(slug));
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const nowActive = toggleFavorite(slug);
+      paint(btn, nowActive);
+    });
+  }
+
+  function refreshAll() {
+    document.querySelectorAll<HTMLButtonElement>(".favorite-button").forEach((btn) => {
+      const slug = btn.dataset.slug;
+      if (slug) paint(btn, isFavorite(slug));
+    });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>(".favorite-button").forEach(wire);
+  onFavoritesChanged(refreshAll);
+</script>
+
+<style>
+  .favorite-button[data-active="true"] {
+    background-color: #fff1f2;
+  }
+</style>

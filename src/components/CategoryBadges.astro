@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { categoriesFor } from "../lib/recipeCategories";
+import { labelFor, categoryTypeMeta } from "../lib/taxonomy";
+
+type Props = {
+  recipe: CollectionEntry<"recipes">;
+  /** Cap number of badges rendered — useful for compact cards */
+  limit?: number;
+  /** Skip these category types (e.g. hide dietary on a dietary landing page) */
+  exclude?: string[];
+  /** Small size for card usage */
+  size?: "sm" | "md";
+};
+
+const {
+  recipe,
+  limit,
+  exclude = [],
+  size = "md",
+} = Astro.props;
+
+const all = categoriesFor(recipe).filter((c) => !exclude.includes(c.type));
+const cats = typeof limit === "number" ? all.slice(0, limit) : all;
+
+const sizeCls =
+  size === "sm"
+    ? "text-[11px] px-2 py-0.5"
+    : "text-xs px-2.5 py-1";
+
+// Color per category type — makes them scannable at a glance.
+const colorFor: Record<string, string> = {
+  cuisine: "bg-amber-50 text-amber-800 border-amber-200",
+  dietary: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  spice: "bg-red-50 text-red-800 border-red-200",
+  occasion: "bg-blue-50 text-blue-800 border-blue-200",
+  method: "bg-purple-50 text-purple-800 border-purple-200",
+  protein: "bg-orange-50 text-orange-800 border-orange-200",
+  "meal-type": "bg-neutral-100 text-neutral-700 border-neutral-200",
+  budget: "bg-teal-50 text-teal-800 border-teal-200",
+};
+---
+
+{
+  cats.length > 0 && (
+    <ul class="flex flex-wrap gap-1.5">
+      {cats.map(({ type, slug }) => {
+        const meta = categoryTypeMeta(type);
+        const item = meta?.values.find((v) => v.slug === slug);
+        const icon = "icon" in (item ?? {}) ? (item as { icon?: string }).icon : "";
+        return (
+          <li>
+            <a
+              href={`/browse/${type}/${slug}`}
+              class={`inline-flex items-center gap-1 rounded-full border no-underline hover:opacity-80 ${sizeCls} ${colorFor[type] ?? "bg-neutral-100 text-neutral-700 border-neutral-200"}`}
+              title={`${meta?.label ?? type}: ${labelFor(type, slug)}`}
+            >
+              {icon && <span>{icon}</span>}
+              <span>{labelFor(type, slug)}</span>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  )
+}

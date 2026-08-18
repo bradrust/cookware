@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-neutral-900 font-sans antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight text-neutral-900;
+  }
+  a {
+    @apply underline decoration-brand-500/40 underline-offset-4 hover:decoration-brand-600;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-medium transition;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 no-underline;
+  }
+  .btn-secondary {
+    @apply btn border border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-50 no-underline;
+  }
+  .recipe-body {
+    @apply text-neutral-800 leading-relaxed;
+  }
+  .recipe-body h2 {
+    @apply font-display text-2xl font-bold mt-6 mb-3;
+  }
+  .recipe-body h3 {
+    @apply font-display text-xl font-semibold mt-5 mb-2;
+  }
+  .recipe-body p {
+    @apply mb-3;
+  }
+  .recipe-body ol {
+    @apply list-decimal ml-5 space-y-2 mb-4;
+  }
+  .recipe-body ul {
+    @apply list-disc ml-5 space-y-2 mb-4;
+  }
+  .recipe-body strong {
+    @apply font-semibold text-neutral-900;
+  }
+  .recipe-body a {
+    @apply text-brand-700;
+  }
+}
+
+/* Print styles — clean, kitchen-friendly print view of any recipe. */
+@media print {
+  .not-print,
+  header[class*="sticky"],
+  footer {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  a {
+    color: black;
+    text-decoration: none;
+  }
+  img {
+    max-width: 4in;
+    height: auto;
+  }
+  .recipe-body,
+  h1,
+  h2,
+  h3 {
+    color: black;
+  }
+}

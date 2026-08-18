@@ -1,0 +1,110 @@
+---
+import "../styles/global.css";
+import { SITE, YOUTUBE, ANALYTICS_SCRIPT } from "../lib/config";
+
+type Props = {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+};
+
+const {
+  title = SITE.name,
+  description = SITE.tagline,
+  image,
+  canonical,
+} = Astro.props;
+
+const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    {image && <meta property="og:image" content={image} />}
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
+
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap"
+    />
+
+    {ANALYTICS_SCRIPT && <Fragment set:html={ANALYTICS_SCRIPT} />}
+  </head>
+  <body>
+    <header class="border-b border-neutral-200 bg-white/80 backdrop-blur sticky top-0 z-20">
+      <div class="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
+        <a
+          href="/"
+          class="no-underline font-display text-xl font-bold text-brand-700"
+        >
+          {SITE.name}
+        </a>
+        <nav class="flex items-center gap-5 text-sm">
+          <a href="/" class="no-underline text-neutral-700 hover:text-brand-700">
+            Recipes
+          </a>
+          <a
+            href="/browse"
+            class="no-underline text-neutral-700 hover:text-brand-700 hidden sm:inline"
+          >
+            Browse
+          </a>
+          <a
+            href="/saved"
+            class="no-underline text-neutral-700 hover:text-brand-700 inline-flex items-center gap-1"
+            aria-label="Saved recipes"
+          >
+            <span aria-hidden="true">♡</span>
+            <span class="hidden sm:inline">Saved</span>
+          </a>
+          <a
+            href={YOUTUBE.channelUrl}
+            target="_blank"
+            rel="noopener"
+            class="no-underline text-neutral-700 hover:text-brand-700"
+          >
+            YouTube ↗
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="mt-24 border-t border-neutral-200 bg-neutral-50">
+      <div class="mx-auto max-w-5xl px-4 py-10 text-sm text-neutral-600 space-y-3">
+        <p>
+          <strong>Affiliate disclosure:</strong> This site contains affiliate
+          links. If you buy through them we may earn a commission at no extra
+          cost to you.
+        </p>
+        <p>
+          © {new Date().getFullYear()} {SITE.name}. All recipes and content are for
+          personal, non-commercial use.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

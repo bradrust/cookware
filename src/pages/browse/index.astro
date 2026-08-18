@@ -1,0 +1,68 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { CATEGORY_TYPES } from "../../lib/taxonomy";
+import { categoriesFor } from "../../lib/recipeCategories";
+
+const recipes = (await getCollection("recipes")).filter((r) => !r.data.draft);
+
+// Build a { type -> { slug -> count } } map so every category link on this
+// page shows how many recipes it holds. Computed at build time — no client JS.
+const counts: Record<string, Record<string, number>> = {};
+for (const type of CATEGORY_TYPES) counts[type.type] = {};
+for (const recipe of recipes) {
+  for (const cat of categoriesFor(recipe)) {
+    counts[cat.type][cat.slug] = (counts[cat.type][cat.slug] ?? 0) + 1;
+  }
+}
+---
+
+<Layout
+  title="Browse Recipes"
+  description="Find dinner by cuisine, diet, spice, occasion, method, protein, or budget."
+>
+  <section class="mx-auto max-w-5xl px-4 pt-14 pb-8">
+    <h1 class="font-display text-4xl sm:text-5xl font-bold tracking-tight">
+      Browse recipes
+    </h1>
+    <p class="mt-3 text-lg text-neutral-600 max-w-prose">
+      Filter by the thing that matters tonight. Every category leads to a page
+      of recipes that match — all still under 30 minutes.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 pb-24 space-y-14">
+    {
+      CATEGORY_TYPES.map((meta) => (
+        <div>
+          <h2 class="font-display text-2xl font-bold mb-1">{meta.label}</h2>
+          <p class="text-neutral-600 text-sm mb-4">{meta.description}</p>
+          <ul class="flex flex-wrap gap-2">
+            {meta.values.map((v) => {
+              const n = counts[meta.type][v.slug] ?? 0;
+              const icon = "icon" in v ? (v as { icon?: string }).icon : undefined;
+              return (
+                <li>
+                  <a
+                    href={`/browse/${meta.type}/${v.slug}`}
+                    class:list={[
+                      "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm no-underline transition",
+                      n > 0
+                        ? "border-neutral-300 bg-white hover:border-brand-500 hover:bg-brand-50 text-neutral-900"
+                        : "border-neutral-200 bg-neutral-50 text-neutral-400",
+                    ]}
+                    aria-disabled={n === 0}
+                  >
+                    {icon && <span>{icon}</span>}
+                    <span>{v.label}</span>
+                    <span class="text-xs text-neutral-500">({n})</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))
+    }
+  </section>
+</Layout>

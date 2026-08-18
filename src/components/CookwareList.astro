@@ -1,0 +1,47 @@
+---
+import { AMAZON_TAG } from "../lib/config";
+
+type CookwareItem = {
+  name: string;
+  asin?: string;
+  url?: string;
+};
+
+type Props = {
+  items: CookwareItem[];
+};
+
+const { items } = Astro.props;
+
+function urlFor(item: CookwareItem): string {
+  if (item.url) return item.url;
+  if (item.asin) {
+    return `https://www.amazon.com/dp/${item.asin}?tag=${encodeURIComponent(AMAZON_TAG)}`;
+  }
+  const params = new URLSearchParams({ k: item.name, tag: AMAZON_TAG });
+  return `https://www.amazon.com/s?${params.toString()}`;
+}
+---
+
+{
+  items.length > 0 && (
+    <div>
+      <h2 class="text-2xl font-display font-bold mb-4">Gear used</h2>
+      <ul class="grid gap-2 sm:grid-cols-2">
+        {items.map((item) => (
+          <li>
+            <a
+              href={urlFor(item)}
+              target="_blank"
+              rel="noopener sponsored"
+              class="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 px-4 py-3 hover:border-brand-500 hover:bg-brand-50 no-underline transition"
+            >
+              <span class="text-neutral-900 font-medium">{item.name}</span>
+              <span class="text-sm text-brand-700">Shop →</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

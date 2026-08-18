@@ -1,0 +1,24 @@
+# CODEOWNERS — who reviews what.
+#
+# GitHub uses this file to auto-request reviews when a PR touches paths
+# below. Combined with branch protection ("Require review from Code Owners"),
+# it means:
+#   - Anyone with write access can push a PR
+#   - A PR touching site code / config / infra REQUIRES an owner review
+#   - A PR touching ONLY recipe markdown auto-approves (with the right rule)
+#
+# Replace @your-github-handle with your actual GitHub username.
+
+# Default: everything requires owner review
+*                                    @your-github-handle
+
+# Recipe content — no code, safe to let content editors self-merge
+# (still governed by branch protection; see COLLABORATION.md)
+/src/content/recipes/                @your-github-handle @amy-github-handle
+
+# Infrastructure / config / secrets — owner only
+/.github/                            @your-github-handle
+/astro.config.mjs                    @your-github-handle
+/package.json                        @your-github-handle
+/package-lock.json                   @your-github-handle
+/src/lib/config.ts                   @your-github-handle

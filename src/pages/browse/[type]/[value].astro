@@ -1,0 +1,92 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import RecipeCard from "../../../components/RecipeCard.astro";
+import { CATEGORY_TYPES, type CategoryType } from "../../../lib/taxonomy";
+import { recipeMatches } from "../../../lib/recipeCategories";
+import { playlistFor, playlistUrl } from "../../../lib/youtube";
+
+export async function getStaticPaths() {
+  const recipes = (await getCollection("recipes")).filter(
+    (r) => !r.data.draft,
+  );
+
+  const paths: Array<{
+    params: { type: string; value: string };
+    props: {
+      type: CategoryType;
+      value: string;
+      typeLabel: string;
+      valueLabel: string;
+      valueDescription?: string;
+      matches: typeof recipes;
+    };
+  }> = [];
+
+  for (const meta of CATEGORY_TYPES) {
+    for (const v of meta.values) {
+      const matches = recipes.filter((r) =>
+        recipeMatches(r, meta.type, v.slug),
+      );
+      if (matches.length === 0) continue; // don't generate empty pages
+      paths.push({
+        params: { type: meta.type, value: v.slug },
+        props: {
+          type: meta.type,
+          value: v.slug,
+          typeLabel: meta.label,
+          valueLabel: v.label,
+          valueDescription:
+            "description" in v ? (v as { description?: string }).description : undefined,
+          matches,
+        },
+      });
+    }
+  }
+  return paths;
+}
+
+const { type, value, valueLabel, typeLabel, valueDescription, matches } = Astro.props;
+const sorted = matches.sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+);
+const playlist = playlistFor(type, value);
+---
+
+<Layout
+  title={`${valueLabel} recipes`}
+  description={`${typeLabel}: ${valueLabel}. ${matches.length} quick recipes.`}
+>
+  <section class="mx-auto max-w-5xl px-4 pt-14 pb-8">
+    <p class="text-sm text-neutral-500">
+      <a href="/browse" class="no-underline hover:text-brand-700">← All categories</a>
+      <span class="mx-2">/</span>
+      <span>{typeLabel}</span>
+    </p>
+    <h1 class="mt-2 font-display text-4xl sm:text-5xl font-bold tracking-tight">
+      {valueLabel}
+    </h1>
+    <p class="mt-3 text-lg text-neutral-600">
+      {valueDescription ?? `${matches.length} recipes — all under 30 minutes.`}
+    </p>
+    {
+      playlist && (
+        <a
+          href={playlistUrl(playlist)}
+          target="_blank"
+          rel="noopener"
+          class="mt-5 inline-flex items-center gap-2 rounded-full bg-red-600 text-white px-5 py-2.5 no-underline hover:bg-red-700 transition"
+        >
+          <span>▶</span>
+          <span>Watch the {valueLabel} playlist on YouTube</span>
+        </a>
+      )
+    }
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 pb-24">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {sorted.map((recipe) => <RecipeCard recipe={recipe} hideBadgeType={type} />)}
+    </div>
+  </section>
+</Layout>

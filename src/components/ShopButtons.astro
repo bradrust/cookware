@@ -1,0 +1,65 @@
+---
+import {
+  instacartCartUrl,
+  walmartCartUrl,
+  amazonFreshUrl,
+  type Ingredient,
+} from "../lib/retailers";
+
+type Props = {
+  ingredients: Ingredient[];
+};
+
+const { ingredients } = Astro.props;
+const instacart = instacartCartUrl(ingredients);
+const walmart = walmartCartUrl(ingredients);
+const amazon = amazonFreshUrl(ingredients);
+---
+
+<section
+  aria-label="Shop this recipe"
+  class="rounded-2xl border border-brand-100 bg-brand-50/60 p-6 space-y-4"
+>
+  <div>
+    <h2 class="text-2xl font-display font-bold text-brand-900">
+      Shop this recipe in one click
+    </h2>
+    <p class="text-neutral-700 text-sm mt-1">
+      Ingredients pre-loaded — pick your grocer, tap through, cook tonight.
+    </p>
+  </div>
+
+  <div class="grid gap-3 sm:grid-cols-3">
+    <a
+      href={instacart}
+      target="_blank"
+      rel="noopener sponsored"
+      class="btn-primary text-center"
+      data-retailer="instacart"
+    >
+      🛒 Instacart
+    </a>
+    <a
+      href={walmart}
+      target="_blank"
+      rel="noopener sponsored"
+      class="btn-secondary text-center"
+      data-retailer="walmart"
+    >
+      🏬 Walmart
+    </a>
+    <a
+      href={amazon}
+      target="_blank"
+      rel="noopener sponsored"
+      class="btn-secondary text-center"
+      data-retailer="amazon-fresh"
+    >
+      📦 Amazon Fresh
+    </a>
+  </div>
+
+  <p class="text-xs text-neutral-500">
+    Affiliate links — thanks for supporting the channel.
+  </p>
+</section>
