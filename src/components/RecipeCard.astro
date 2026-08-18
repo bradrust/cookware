@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import CategoryBadges from "./CategoryBadges.astro";
 import FavoriteButton from "./FavoriteButton.astro";
+import { link } from "../lib/link";
 
 type Props = {
   recipe: CollectionEntry<"recipes">;
@@ -20,7 +21,7 @@ const slug = recipe.slug;
 
 <div class="relative group" data-recipe-slug={slug}>
   <a
-    href={`/recipes/${slug}`}
+    href={link(`/recipes/${slug}`)}
     class="block rounded-2xl overflow-hidden border border-neutral-200 hover:border-brand-500 transition no-underline"
   >
     <div class="aspect-[4/3] bg-neutral-100 overflow-hidden">

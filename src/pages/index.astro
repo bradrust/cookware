@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import RecipeCard from "../components/RecipeCard.astro";
 import EmailSignup from "../components/EmailSignup.astro";
 import { SITE } from "../lib/config";
+import { link } from "../lib/link";
 
 const recipes = (await getCollection("recipes"))
   .filter((r) => !r.data.draft)
@@ -12,19 +13,20 @@ const recipes = (await getCollection("recipes"))
   );
 
 // Handful of high-traffic category shortcuts on the homepage.
-const FEATURED_CATEGORIES: Array<{ href: string; label: string; icon: string }> = [
-  { href: "/browse/occasion/weeknight", label: "Weeknight", icon: "🕕" },
-  { href: "/browse/occasion/meal-prep", label: "Meal prep", icon: "📦" },
-  { href: "/browse/occasion/kid-friendly", label: "Kid-friendly", icon: "🧒" },
-  { href: "/browse/occasion/date-night", label: "Date night", icon: "🕯" },
-  { href: "/browse/occasion/cheap-eats", label: "Cheap eats", icon: "💸" },
-  { href: "/browse/dietary/vegetarian", label: "Vegetarian", icon: "🥗" },
-  { href: "/browse/dietary/vegan", label: "Vegan", icon: "🌱" },
-  { href: "/browse/dietary/keto", label: "Keto", icon: "🥑" },
-  { href: "/browse/cuisine/mexican", label: "Mexican", icon: "🌮" },
-  { href: "/browse/cuisine/italian", label: "Italian", icon: "🍝" },
-  { href: "/browse/method/sheet-pan", label: "Sheet pan", icon: "🍳" },
-  { href: "/browse/method/one-pot", label: "One-pot", icon: "🍲" },
+// Paths pass through link() at render time so they respect Astro's base.
+const FEATURED_CATEGORIES: Array<{ path: string; label: string; icon: string }> = [
+  { path: "/browse/occasion/weeknight", label: "Weeknight", icon: "🕕" },
+  { path: "/browse/occasion/meal-prep", label: "Meal prep", icon: "📦" },
+  { path: "/browse/occasion/kid-friendly", label: "Kid-friendly", icon: "🧒" },
+  { path: "/browse/occasion/date-night", label: "Date night", icon: "🕯" },
+  { path: "/browse/occasion/cheap-eats", label: "Cheap eats", icon: "💸" },
+  { path: "/browse/dietary/vegetarian", label: "Vegetarian", icon: "🥗" },
+  { path: "/browse/dietary/vegan", label: "Vegan", icon: "🌱" },
+  { path: "/browse/dietary/keto", label: "Keto", icon: "🥑" },
+  { path: "/browse/cuisine/mexican", label: "Mexican", icon: "🌮" },
+  { path: "/browse/cuisine/italian", label: "Italian", icon: "🍝" },
+  { path: "/browse/method/sheet-pan", label: "Sheet pan", icon: "🍳" },
+  { path: "/browse/method/one-pot", label: "One-pot", icon: "🍲" },
 ];
 ---
 
@@ -44,7 +46,7 @@ const FEATURED_CATEGORIES: Array<{ href: string; label: string; icon: string }> 
       {
         FEATURED_CATEGORIES.map((c) => (
           <a
-            href={c.href}
+            href={link(c.path)}
             class="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-3 py-1.5 text-sm no-underline hover:border-brand-500 hover:bg-brand-50 transition"
           >
             <span>{c.icon}</span>
@@ -53,7 +55,7 @@ const FEATURED_CATEGORIES: Array<{ href: string; label: string; icon: string }> 
         ))
       }
       <a
-        href="/browse"
+        href={link("/browse")}
         class="inline-flex items-center gap-1.5 rounded-full border border-brand-500 bg-brand-50 text-brand-800 px-3 py-1.5 text-sm no-underline hover:bg-brand-100 transition"
       >
         Browse all →

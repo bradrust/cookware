@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import { categoriesFor } from "../lib/recipeCategories";
 import { labelFor, categoryTypeMeta } from "../lib/taxonomy";
+import { link } from "../lib/link";
 
 type Props = {
   recipe: CollectionEntry<"recipes">;
@@ -51,7 +52,7 @@ const colorFor: Record<string, string> = {
         return (
           <li>
             <a
-              href={`/browse/${type}/${slug}`}
+              href={link(`/browse/${type}/${slug}`)}
               class={`inline-flex items-center gap-1 rounded-full border no-underline hover:opacity-80 ${sizeCls} ${colorFor[type] ?? "bg-neutral-100 text-neutral-700 border-neutral-200"}`}
               title={`${meta?.label ?? type}: ${labelFor(type, slug)}`}
             >

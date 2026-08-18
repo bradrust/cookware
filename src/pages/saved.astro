@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import RecipeCard from "../components/RecipeCard.astro";
+import { link } from "../lib/link";
 
 // We render every non-draft recipe card into the page, each hidden. The
 // small script below reads localStorage and shows only the matching ones.
@@ -39,7 +40,7 @@ const recipes = (await getCollection("recipes")).filter((r) => !r.data.draft);
         Tap the ♡ on any recipe to save it here.
       </p>
       <p class="mt-4">
-        <a href="/" class="text-brand-700">Browse recipes →</a>
+        <a href={link("/")} class="text-brand-700">Browse recipes →</a>
       </p>
     </div>
 

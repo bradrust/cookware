@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { CATEGORY_TYPES } from "../../lib/taxonomy";
 import { categoriesFor } from "../../lib/recipeCategories";
+import { link } from "../../lib/link";
 
 const recipes = (await getCollection("recipes")).filter((r) => !r.data.draft);
 
@@ -44,7 +45,7 @@ for (const recipe of recipes) {
               return (
                 <li>
                   <a
-                    href={`/browse/${meta.type}/${v.slug}`}
+                    href={link(`/browse/${meta.type}/${v.slug}`)}
                     class:list={[
                       "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm no-underline transition",
                       n > 0
